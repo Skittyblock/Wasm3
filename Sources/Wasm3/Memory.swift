@@ -87,9 +87,6 @@ public extension Memory {
 
     func readString(offset: UInt32, length: UInt32) throws -> String {
         let data = try readData(offset: offset, length: length)
-        guard let string = String(data: data, encoding: .utf8) else {
-            throw Wasm3Error.failedAllocation // invalidUTF8String
-        }
-        return string
+        return String(decoding: data, as: UTF8.self)
     }
 }

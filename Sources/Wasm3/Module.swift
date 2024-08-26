@@ -128,7 +128,7 @@ extension Module {
         Self.linkedFunctionCache[context] = function
 
         func handler(
-            _ runtime: UnsafeMutablePointer<M3Runtime>?,
+            _: UnsafeMutablePointer<M3Runtime>?,
             _ context: UnsafeMutablePointer<M3ImportContext>?,
             _ stackPointer: UnsafeMutablePointer<UInt64>?,
             _ memory: UnsafeMutableRawPointer?
@@ -151,6 +151,7 @@ extension Module {
     private static func argument<T: WasmType>(
         from stack: UnsafeMutablePointer<UInt64>?,
         at index: Int,
+        // swiftlint:disable:next unused_parameter
         as type: T.Type
     ) throws -> T {
         guard let stack = UnsafeMutableRawPointer(stack)

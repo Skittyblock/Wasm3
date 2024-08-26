@@ -9,6 +9,7 @@ disabled_rules:
   - attributes
   - closure_body_length
   - conditional_returns_on_newline
+  - contrasted_opening_brace
   - discouraged_optional_collection
   - explicit_acl
   - explicit_enum_raw_value
@@ -34,6 +35,7 @@ disabled_rules:
   - no_grouping_extension
   - no_magic_numbers
   - number_separator
+  - one_declaration_per_file
   - prefer_nimble
   - prefixed_toplevel_constant
   - redundant_self_in_closure

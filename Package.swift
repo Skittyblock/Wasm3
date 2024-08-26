@@ -12,13 +12,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint", from: "0.52.0")
+        .package(url: "https://github.com/realm/SwiftLint", from: "0.56.0")
     ],
     targets: [
         .target(
             name: "Wasm3",
             dependencies: ["wasm3-c"],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "SwiftLint")]
+            plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint")]
         ),
         .target(
             name: "wasm3-c",
