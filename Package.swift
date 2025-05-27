@@ -17,7 +17,7 @@ let package = Package(
     targets: [
         .target(
             name: "Wasm3",
-            dependencies: ["wasm3-c"],
+            dependencies: ["wasm3-c", "wasm3-support"],
             plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint")]
         ),
         .target(
@@ -28,6 +28,10 @@ let package = Package(
                 .define("d_m3HasWASI", to: "YES"),
                 .unsafeFlags(["-Wno-shorten-64-to-32"])
             ]
+        ),
+        .target(
+            name: "wasm3-support",
+            dependencies: ["wasm3-c"]
         ),
         .testTarget(
             name: "Wasm3Tests",
