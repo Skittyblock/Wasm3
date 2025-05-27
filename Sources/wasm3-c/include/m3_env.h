@@ -21,6 +21,7 @@ typedef struct M3MemoryInfo
 {
     u32     initPages;
     u32     maxPages;
+    u32     pageSize;
 }
 M3MemoryInfo;
 
@@ -31,6 +32,7 @@ typedef struct M3Memory
 
     u32                     numPages;
     u32                     maxPages;
+    u32                     pageSize;
 }
 M3Memory;
 
@@ -110,9 +112,12 @@ typedef struct M3Module
 
     IM3Function *           table0;
     u32                     table0Size;
+    const char*             table0ExportName;
 
     M3MemoryInfo            memoryInfo;
+    M3ImportInfo            memoryImport;
     bool                    memoryImported;
+    const char*             memoryExportName;
 
     //bool                    hasWasmCodeCopy;
 
@@ -168,6 +173,7 @@ typedef struct M3Runtime
     IM3Module               modules;        // linked list of imported modules
 
     void *                  stack;
+    void *                  originStack;
     u32                     stackSize;
     u32                     numStackSlots;
     IM3Function             lastCalled;     // last function that successfully executed

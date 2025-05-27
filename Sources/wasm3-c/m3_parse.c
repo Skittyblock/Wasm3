@@ -29,8 +29,15 @@ _   (ReadLEB_u7 (& flag, io_bytes, i_end));                   // really a u1
 _   (ReadLEB_u32 (& o_memory->initPages, io_bytes, i_end));
 
     o_memory->maxPages = 0;
-    if (flag)
+    if (flag & (1u << 0))
 _       (ReadLEB_u32 (& o_memory->maxPages, io_bytes, i_end));
+
+    o_memory->pageSize = 0;
+    if (flag & (1u << 3)) {
+        u32 logPageSize;
+_       (ReadLEB_u32 (& logPageSize, io_bytes, i_end));
+        o_memory->pageSize = 1u << logPageSize;
+    }
 
     _catch: return result;
 }
@@ -184,6 +191,8 @@ _               (Module_AddFunction (io_module, typeIndex, & import))
             {
 _               (ParseType_Memory (& io_module->memoryInfo, & i_bytes, i_end));
                 io_module->memoryImported = true;
+                io_module->memoryImport = import;
+                import = clearImport;
             }
             break;
 
@@ -255,6 +264,18 @@ _       (ReadLEB_u32 (& index, & i_bytes, i_end));                              
             m3_Free (global->name);
             global->name = utf8;
             utf8 = NULL; // ownership transferred to M3Global
+        }
+        else if (exportKind == d_externalKind_memory)
+        {
+            m3_Free (io_module->memoryExportName);
+            io_module->memoryExportName = utf8;
+            utf8 = NULL; // ownership transferred to M3Module
+        }
+        else if (exportKind == d_externalKind_table)
+        {
+            m3_Free (io_module->table0ExportName);
+            io_module->table0ExportName = utf8;
+            utf8 = NULL; // ownership transferred to M3Module
         }
 
         m3_Free (utf8);
