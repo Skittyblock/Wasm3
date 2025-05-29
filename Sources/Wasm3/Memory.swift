@@ -87,6 +87,6 @@ public extension Memory {
 
     func readString(offset: UInt32, length: UInt32) throws -> String {
         let data = try readData(offset: offset, length: length)
-        return String(decoding: data, as: UTF8.self)
+        return String(bytes: data, encoding: .utf8) ?? ""
     }
 }

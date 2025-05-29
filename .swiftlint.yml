@@ -5,7 +5,6 @@ opt_in_rules:
   - all
 disabled_rules:
   - anonymous_argument_in_multiline_closure
-  - anyobject_protocol
   - attributes
   - closure_body_length
   - conditional_returns_on_newline
@@ -22,7 +21,6 @@ disabled_rules:
   - function_default_parameter_at_end
   - function_body_length
   - indentation_width
-  - inert_defer
   - missing_docs
   - multiline_arguments
   - multiline_arguments_brackets
@@ -48,7 +46,6 @@ disabled_rules:
   - todo
   - type_body_length
   - type_contents_order
-  - unused_capture_list
   - vertical_whitespace_between_cases
 custom_rules:
   comment_whitespace:
