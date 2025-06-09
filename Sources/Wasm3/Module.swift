@@ -45,12 +45,7 @@ public class Module {
     var raw: IM3Module
     public var runtime: Runtime
 
-    // (stack, memory) -> trap?
-    typealias LinkedFunctionSignature = (
-        UnsafeMutablePointer<UInt64>?, UnsafeMutableRawPointer?
-    ) -> UnsafeRawPointer?
-
-    private static var linkedFunctionCache = [UnsafeMutableRawPointer: LinkedFunctionSignature]()
+    private static let linkedFunctionCache = LinkedFunctionCache()
 
     public static func parse(env: Environment, bytes: [UInt8]) throws -> ParsedModule {
         try ParsedModule.parse(env: env, bytes: bytes)
@@ -118,14 +113,16 @@ extension Module {
         signature: String,
         function: @escaping LinkedFunctionSignature
     ) throws {
-        guard let context = UnsafeMutableRawPointer(
-            bitPattern: (id.uuidString + namespace + name).hashValue
-        ) else {
+        guard
+            let context = UnsafeMutableRawPointer(
+                bitPattern: (id.uuidString + namespace + name).hashValue
+            )
+        else {
             throw Wasm3Error.failedAllocation
         }
 
         // save linked functions in a cache to be accessed from handler
-        Self.linkedFunctionCache[context] = function
+        Self.linkedFunctionCache.set(function, for: context)
 
         func handler(
             _: UnsafeMutablePointer<M3Runtime>?,
@@ -135,7 +132,7 @@ extension Module {
         ) -> UnsafeRawPointer? {
             guard
                 let userData = context?.pointee.userdata,
-                let function = Module.linkedFunctionCache[userData]
+                let function = Module.linkedFunctionCache.get(userData)?.function
             else {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
             }
@@ -176,11 +173,16 @@ extension Module {
         let functionHandler: LinkedFunctionSignature = { stack, _ in
             var counter = 0
             do {
-                function(repeat (try Self.argument(from: stack, at: {
-                    let ret = counter
-                    counter += 1
-                    return ret
-                }(), as: (each T).self)))
+                function(
+                    repeat
+                    (try Self.argument(
+                        from: stack,
+                        at: {
+                            let ret = counter
+                            counter += 1
+                            return ret
+                        }(), as: (each T).self))
+                )
             } catch {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
             }
@@ -211,11 +213,14 @@ extension Module {
                 let memory = try self.runtime.memory()
                 function(
                     memory,
-                    repeat (try Self.argument(from: stack, at: {
-                        let ret = counter
-                        counter += 1
-                        return ret
-                    }(), as: (each T).self))
+                    repeat
+                    (try Self.argument(
+                        from: stack,
+                        at: {
+                            let ret = counter
+                            counter += 1
+                            return ret
+                        }(), as: (each T).self))
                 )
             } catch {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
@@ -241,11 +246,16 @@ extension Module {
         let functionHandler: LinkedFunctionSignature = { stack, _ in
             var counter = 1
             do {
-                let result = function(repeat (try Self.argument(from: stack, at: {
-                    let ret = counter
-                    counter += 1
-                    return ret
-                }(), as: (each T).self)))
+                let result = function(
+                    repeat
+                    (try Self.argument(
+                        from: stack,
+                        at: {
+                            let ret = counter
+                            counter += 1
+                            return ret
+                        }(), as: (each T).self))
+                )
                 try Self.storeReturn(value: result, stack: stack)
             } catch {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
@@ -279,11 +289,14 @@ extension Module {
                 let memory = self.runtime.memory(from: heap)
                 let result = function(
                     memory,
-                    repeat (try Self.argument(from: stack, at: {
-                        let ret = counter
-                        counter += 1
-                        return ret
-                    }(), as: (each T).self))
+                    repeat
+                    (try Self.argument(
+                        from: stack,
+                        at: {
+                            let ret = counter
+                            counter += 1
+                            return ret
+                        }(), as: (each T).self))
                 )
                 try Self.storeReturn(value: result, stack: stack)
             } catch {
