@@ -34,14 +34,13 @@ public class Function {
 //    }
 
     private func call(_ args: [WasmType]) throws {
-        var args = args
-        var argPtrs: [UnsafeRawPointer?] = []
-        for idx in 0..<args.count {
-            withUnsafePointer(to: &args[idx]) {
-                argPtrs.append($0)
-            }
+        var argsCopy = args
+        let result = argsCopy.withUnsafeMutableBufferPointer { buffer in
+            var argPtrs: [UnsafeRawPointer?] = buffer.baseAddress.map { base in
+                (0..<buffer.count).map { UnsafeRawPointer(base + $0) }
+            } ?? []
+            return m3_Call(raw, UInt32(args.count), &argPtrs)
         }
-        let result = m3_Call(raw, UInt32(args.count), &argPtrs)
         if let result {
             throw Wasm3Error(ffiResult: result)
         }
