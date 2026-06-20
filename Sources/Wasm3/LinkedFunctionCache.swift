@@ -9,7 +9,7 @@ import Foundation
 
 // A (hopefully) thread-safe cache for storing linked functions.
 final class LinkedFunctionCache: @unchecked Sendable {
-    typealias Key = UnsafeRawPointer
+    typealias Key = UnsafeRawPointerBox
 
     private var storage: [Key: LinkedFunctionHolder] = [:]
     private let queue = DispatchQueue(label: "Wasm3.LinkedFunctionCache")
@@ -53,6 +53,10 @@ struct LinkedFunctionHolder: @unchecked Sendable {
     let function: LinkedFunctionSignature
 }
 
-extension UnsafeRawPointer: @unchecked @retroactive Sendable {}
-extension UnsafeMutableRawPointer: @unchecked @retroactive Sendable {}
-extension UnsafeMutablePointer<UInt64>: @unchecked @retroactive Sendable {}
+struct UnsafeRawPointerBox: @unchecked Sendable, Hashable {
+    let inner: UnsafeRawPointer
+
+    init(_ inner: UnsafeRawPointer) {
+        self.inner = inner
+    }
+}

@@ -35,21 +35,21 @@ func typeToM3Value(_ type: WasmType.Type) -> UInt8 {
 
 extension Int32 {
     init(safe value: UInt32) {
-        if value > UInt32(Int32.max) {
-            self = Int32(-value.distance(to: UInt32.max) - 1)
+        if value > UInt32(Self.max) {
+            self = Self(-value.distance(to: UInt32.max) - 1)
         } else {
-            self = Int32(value)
+            self = Self(value)
         }
     }
 }
 
 extension Int64 {
     init(safe value: UInt64) {
-        let max = UInt64(Int64.max)
+        let max = UInt64(Self.max)
         if value > max {
-            self = Int64(-value.distance(to: UInt64.max) - 1)
+            self = Self(-value.distance(to: UInt64.max) - 1)
         } else {
-            self = Int64(value)
+            self = Self(value)
         }
     }
 }
@@ -57,9 +57,9 @@ extension Int64 {
 extension UInt32 {
     init(safe value: Int32) {
         if value < 0 {
-            self = UInt32.max - UInt32(value.distance(to: -1))
+            self = Self.max - Self(value.distance(to: -1))
         } else {
-            self = UInt32(value)
+            self = Self(value)
         }
     }
 }
@@ -67,9 +67,9 @@ extension UInt32 {
 extension UInt64 {
     init(safe value: Int64) {
         if value < 0 {
-            self = UInt64.max - UInt64(value.distance(to: -1))
+            self = Self.max - Self(value.distance(to: -1))
         } else {
-            self = UInt64(value)
+            self = Self(value)
         }
     }
 }

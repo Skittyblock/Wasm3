@@ -36,7 +36,7 @@ disabled_rules:
   - one_declaration_per_file
   - prefer_nimble
   - prefixed_toplevel_constant
-  - redundant_self_in_closure
+  - redundant_self
   - required_deinit
   - sorted_enum_cases
   - strict_fileprivate
@@ -46,6 +46,7 @@ disabled_rules:
   - todo
   - type_body_length
   - type_contents_order
+  - variable_shadowing
   - vertical_whitespace_between_cases
 custom_rules:
   comment_whitespace:

@@ -122,7 +122,7 @@ extension Module {
         }
 
         // save linked functions in a cache to be accessed from handler
-        Self.linkedFunctionCache.set(function, for: context)
+        Self.linkedFunctionCache.set(function, for: .init(context))
 
         func handler(
             _: UnsafeMutablePointer<M3Runtime>?,
@@ -132,7 +132,8 @@ extension Module {
         ) -> UnsafeRawPointer? {
             guard
                 let userData = context?.pointee.userdata,
-                let function = Module.linkedFunctionCache.get(userData)?.function
+                // swiftlint:disable:next prefer_self_in_static_references
+                let function = Module.linkedFunctionCache.get(.init(userData))?.function
             else {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
             }
@@ -181,7 +182,9 @@ extension Module {
                             let ret = counter
                             counter += 1
                             return ret
-                        }(), as: (each T).self))
+                        }(),
+                        as: (each T).self)
+                    )
                 )
             } catch {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
@@ -220,7 +223,9 @@ extension Module {
                             let ret = counter
                             counter += 1
                             return ret
-                        }(), as: (each T).self))
+                        }(),
+                        as: (each T).self)
+                    )
                 )
             } catch {
                 return UnsafeRawPointer(m3Err_trapUnreachable)
@@ -254,7 +259,9 @@ extension Module {
                             let ret = counter
                             counter += 1
                             return ret
-                        }(), as: (each T).self))
+                        }(),
+                        as: (each T).self)
+                    )
                 )
                 try Self.storeReturn(value: result, stack: stack)
             } catch {
@@ -296,7 +303,9 @@ extension Module {
                             let ret = counter
                             counter += 1
                             return ret
-                        }(), as: (each T).self))
+                        }(),
+                        as: (each T).self)
+                    )
                 )
                 try Self.storeReturn(value: result, stack: stack)
             } catch {
