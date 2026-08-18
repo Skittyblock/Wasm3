@@ -12,6 +12,7 @@ public class Runtime {
     internal var raw: IM3Runtime
     private var env: Environment
     private var moduleData: [[UInt8]] = []
+    internal var executionDisabled = false
 
     public init(env: Environment, stackSize: UInt32) throws {
         let runtime = m3_NewRuntime(env.raw, stackSize, nil)
@@ -97,5 +98,9 @@ public class Runtime {
         let size = m3_GetMemorySize(raw)
         let pointer = pointer.assumingMemoryBound(to: UInt8.self)
         return Memory(raw: pointer, size: size)
+    }
+
+    public func isDisabled() -> Bool {
+        executionDisabled
     }
 }

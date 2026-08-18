@@ -34,6 +34,10 @@ public class Function {
 //    }
 
     private func call(_ args: [WasmType]) throws {
+        guard !runtime.executionDisabled else {
+            throw Wasm3Error.runtimeDisabled
+        }
+
         var argsCopy = args
         let result = argsCopy.withUnsafeMutableBufferPointer { buffer in
             var argPtrs: [UnsafeRawPointer?] = buffer.baseAddress.map { base in
@@ -42,7 +46,11 @@ public class Function {
             return m3_Call(raw, UInt32(args.count), &argPtrs)
         }
         if let result {
-            throw Wasm3Error(ffiResult: result)
+            let error = Wasm3Error(ffiResult: result)
+            if error.isTrap {
+                runtime.executionDisabled = true
+            }
+            throw error
         }
     }
 

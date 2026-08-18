@@ -92,6 +92,10 @@ public class Module {
             throw Wasm3Error(ffiResult: result)
         }
     }
+
+    public func isDisabled() -> Bool {
+        runtime.executionDisabled
+    }
 }
 
 // MARK: Linking
