@@ -1,0 +1,65 @@
+diff --git a/Sources/wasm3-c/include/m3_config.h b/Sources/wasm3-c/include/m3_config.h
+index a7f1532..e7c1295 100644
+--- a/Sources/wasm3-c/include/m3_config.h
++++ b/Sources/wasm3-c/include/m3_config.h
+@@ -153,4 +153,8 @@
+ 
+ #define d_m3EnableCodePageRefCounting           0       // not supported currently
+ 
++# ifndef d_m3MaxCallDepth
++#   define d_m3MaxCallDepth 256
++#endif
++
+ #endif // m3_config_h
+diff --git a/Sources/wasm3-c/include/m3_env.h b/Sources/wasm3-c/include/m3_env.h
+index 443cfe8..da8b5f9 100644
+--- a/Sources/wasm3-c/include/m3_env.h
++++ b/Sources/wasm3-c/include/m3_env.h
+@@ -183,9 +183,9 @@ typedef struct M3Runtime
+     M3Memory                memory;
+     u32                     memoryLimit;
+ 
+-#if d_m3EnableStrace >= 2
++// #if d_m3EnableStrace >= 2
+     u32                     callDepth;
+-#endif
++// #endif
+ 
+     M3ErrorInfo             error;
+ #if d_m3VerboseErrorMessages
+diff --git a/Sources/wasm3-c/include/m3_exec.h b/Sources/wasm3-c/include/m3_exec.h
+index 832a521..9720fe6 100644
+--- a/Sources/wasm3-c/include/m3_exec.h
++++ b/Sources/wasm3-c/include/m3_exec.h
+@@ -806,11 +806,12 @@ d_m3Op  (Entry)
+ 
+     IM3Function function = immediate (IM3Function);
+     IM3Memory memory = m3MemInfo (_mem);
++    IM3Runtime runtime = m3MemRuntime (_mem);
+ 
+ #if d_m3SkipStackCheck
+-    if (true)
++    if (M3_LIKELY (runtime->callDepth < d_m3MaxCallDepth))
+ #else
+-    if (M3_LIKELY ((void *) (_sp + function->maxStackSlots) < _mem->maxStack))
++    if (M3_LIKELY ((void *) (_sp + function->maxStackSlots) < _mem->maxStack && runtime->callDepth < d_m3MaxCallDepth))
+ #endif
+     {
+ #if defined(DEBUG)
+@@ -828,14 +829,13 @@ d_m3Op  (Entry)
+ 
+ #if d_m3EnableStrace >= 2
+         d_m3TracePrint("%s %s {", m3_GetFunctionName(function), SPrintFunctionArgList (function, _sp + function->numRetSlots));
+-        trace_rt->callDepth++;
+ #endif
+ 
++        runtime->callDepth++;
+         m3ret_t r = nextOpImpl ();
++        runtime->callDepth--;
+ 
+ #if d_m3EnableStrace >= 2
+-        trace_rt->callDepth--;
+-
+         if (r) {
+             d_m3TracePrint("} !trap = %s", (char*)r);
+         } else {

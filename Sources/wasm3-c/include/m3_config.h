@@ -153,4 +153,8 @@
 
 #define d_m3EnableCodePageRefCounting           0       // not supported currently
 
+# ifndef d_m3MaxCallDepth
+#   define d_m3MaxCallDepth 256
+#endif
+
 #endif // m3_config_h

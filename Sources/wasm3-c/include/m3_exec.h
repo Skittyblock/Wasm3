@@ -806,11 +806,12 @@ d_m3Op  (Entry)
 
     IM3Function function = immediate (IM3Function);
     IM3Memory memory = m3MemInfo (_mem);
+    IM3Runtime runtime = m3MemRuntime (_mem);
 
 #if d_m3SkipStackCheck
-    if (true)
+    if (M3_LIKELY (runtime->callDepth < d_m3MaxCallDepth))
 #else
-    if (M3_LIKELY ((void *) (_sp + function->maxStackSlots) < _mem->maxStack))
+    if (M3_LIKELY ((void *) (_sp + function->maxStackSlots) < _mem->maxStack && runtime->callDepth < d_m3MaxCallDepth))
 #endif
     {
 #if defined(DEBUG)
@@ -828,14 +829,13 @@ d_m3Op  (Entry)
 
 #if d_m3EnableStrace >= 2
         d_m3TracePrint("%s %s {", m3_GetFunctionName(function), SPrintFunctionArgList (function, _sp + function->numRetSlots));
-        trace_rt->callDepth++;
 #endif
 
+        runtime->callDepth++;
         m3ret_t r = nextOpImpl ();
+        runtime->callDepth--;
 
 #if d_m3EnableStrace >= 2
-        trace_rt->callDepth--;
-
         if (r) {
             d_m3TracePrint("} !trap = %s", (char*)r);
         } else {

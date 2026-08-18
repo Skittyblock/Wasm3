@@ -183,9 +183,9 @@ typedef struct M3Runtime
     M3Memory                memory;
     u32                     memoryLimit;
 
-#if d_m3EnableStrace >= 2
+// #if d_m3EnableStrace >= 2
     u32                     callDepth;
-#endif
+// #endif
 
     M3ErrorInfo             error;
 #if d_m3VerboseErrorMessages
