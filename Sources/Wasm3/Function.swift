@@ -54,11 +54,7 @@ public class Function {
         }
     }
 
-    public func call(_ args: WasmType...) throws {
-        try call(args)
-    }
-
-    public func call<Ret: WasmType>(_ args: WasmType...) throws -> Ret {
+    public func call<Ret: WasmType>(_ args: [WasmType]) throws -> Ret {
         // check that function returns a value
         let retCount = GetFunctionNumReturns(raw)
         if retCount != 1 {
@@ -109,5 +105,13 @@ public class Function {
             throw Wasm3Error.failedAllocation
         }
         return retValue
+    }
+
+    public func call(_ args: WasmType...) throws {
+        try call(args)
+    }
+
+    public func call<Ret: WasmType>(_ args: WasmType...) throws -> Ret {
+        try call(args)
     }
 }
