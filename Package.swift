@@ -1,6 +1,12 @@
 // swift-tools-version: 6.0
 
+import Foundation
 import PackageDescription
+
+let swiftLintPlugins: [Target.PluginUsage] =
+    ProcessInfo.processInfo.environment["AIDOKU_SKIP_SWIFTLINT"] == nil
+        ? [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")]
+        : []
 
 let package = Package(
     name: "Wasm3",
@@ -18,7 +24,7 @@ let package = Package(
         .target(
             name: "Wasm3",
             dependencies: ["wasm3-c", "wasm3-support"],
-            plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")]
+            plugins: swiftLintPlugins
         ),
         .target(
             name: "wasm3-c",
