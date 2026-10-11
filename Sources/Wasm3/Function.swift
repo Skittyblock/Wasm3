@@ -33,7 +33,7 @@ public class Function {
 //        }
 //    }
 
-    private func call(_ args: [WasmType]) throws {
+    public func call(_ args: [WasmType]) throws {
         guard !runtime.executionDisabled else {
             throw Wasm3Error.runtimeDisabled
         }
